@@ -1060,33 +1060,8 @@
 
     wrappedText: function(text, x, y, maxWidth, newlineCallback) {
 
-      var words = text.split(" ");
-
+			var lines = this.flowText(text, maxWidth);
       var h = this.font().match(/\d+/g)[0] * 2;
-
-      var ox = 0;
-      var oy = 0;
-
-      if(maxWidth) {
-        var line = 0;
-        var lines = [""];
-
-        for(var i = 0; i < words.length; i++) {
-          var word = words[i] + " ";
-          var wordWidth = this.context.measureText(word).width;
-
-          if(ox + wordWidth > maxWidth) {            
-            lines[++line] = "";
-            ox = 0;            
-          }
-
-          lines[line] += word;
-
-          ox += wordWidth;
-        }
-      } else {
-        var lines = [text];
-      }
 
       for(var i = 0; i < lines.length; i++) {
         var oy = y + i * h * 0.6 | 0;
@@ -1099,12 +1074,11 @@
       }
 
       return this;
-    },
 
-    textBoundaries: function(text, maxWidth) {
-      var words = text.split(" ");
+		},
 
-      var h = this.font().match(/\d+/g)[0] * 2;
+		flowText: function(text, maxWidth) {
+      var words = text.split(/(\s)/);
 
       var ox = 0;
       var oy = 0;
@@ -1113,22 +1087,64 @@
         var line = 0;
         var lines = [""];
 
+        var spaceWidth = this.context.measureText(" ").width;
+
         for(var i = 0; i < words.length; i++) {
-          var word = words[i] + " ";
-          var wordWidth = this.context.measureText(word).width;
 
-          if(ox + wordWidth > maxWidth) {
+          var word = words[i];
+
+					if (word == "\n") {
+            lines[line] = lines[line].replace(/\s+$/,"");
             lines[++line] = "";
-            ox = 0;
+						ox = 0;
+						continue;
+					}
+
+					else if (word == " ") {
+						ox += spaceWidth;
+						if (ox > maxWidth) {
+            	lines[line] = lines[line].replace(/\s+$/,"");
+              lines[++line] = "";
+						  ox = 0;
+						}
+						else {
+							lines[line] += " ";
+						}
+					}
+
+					else {
+            var wordWidth = this.context.measureText(word).width;
+
+            ox += wordWidth;
+
+            if(ox > maxWidth) {
+            	lines[line] = lines[line].replace(/\s+$/,"");
+              lines[++line] = "";
+              ox = wordWidth;
+            }
+
+            lines[line] += word;
           }
-
-          lines[line] += word;
-
-          ox += wordWidth;
         }
       } else {
         var lines = [text];
-        maxWidth = this.measureText(text).width;
+      }
+
+			return lines;
+
+    },
+
+    textBoundaries: function(text, maxWidth) {
+
+			var lines = this.flowText(text, maxWidth || Infinity);
+
+      var h = this.font().match(/\d+/g)[0] * 2;
+
+			if (! maxWidth) {
+				maxWidth = 0;
+				for (var i = 0; i < lines.length; i++) {
+        	maxWidth = Math.max( maxWidth, this.measureText(text).width );
+				}
       }
 
       return {
