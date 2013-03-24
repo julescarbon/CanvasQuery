@@ -1117,7 +1117,7 @@
 
             ox += wordWidth;
 
-            if(ox > maxWidth) {
+            if(ox > maxWidth && lines[line].length) {
             	lines[line] = lines[line].replace(/\s+$/,"");
               lines[++line] = "";
               ox = wordWidth;
@@ -1140,12 +1140,10 @@
 
       var h = this.font().match(/\d+/g)[0] * 2;
 
-			if (! maxWidth) {
-				maxWidth = 0;
-				for (var i = 0; i < lines.length; i++) {
-        	maxWidth = Math.max( maxWidth, this.measureText(text).width );
-				}
-      }
+			maxWidth = 0;
+			for (var i = 0; i < lines.length; i++) {
+       	maxWidth = Math.max( maxWidth, this.measureText(text).width );
+			}
 
       return {
         height: lines.length * h * 0.6 | 0,
