@@ -1060,7 +1060,7 @@
 
     wrappedText: function(text, x, y, maxWidth, newlineCallback) {
 
-			var lines = this.flowText(text, maxWidth);
+			var lines = text instanceof Array ? text : this.flowText(text, maxWidth);
       var h = this.font().match(/\d+/g)[0] * 2;
 
       for(var i = 0; i < lines.length; i++) {
@@ -1147,7 +1147,8 @@
 
       return {
         height: lines.length * h * 0.6 | 0,
-        width: w
+        width: w,
+				lines: lines
       }
     },
 
