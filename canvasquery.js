@@ -1140,14 +1140,14 @@
 
       var h = this.font().match(/\d+/g)[0] * 2;
 
-			maxWidth = 0;
+			var w = 0;
 			for (var i = 0; i < lines.length; i++) {
-       	maxWidth = Math.max( maxWidth, this.measureText(text).width );
+       	w = Math.max( w, this.measureText(lines[i]).width );
 			}
 
       return {
         height: lines.length * h * 0.6 | 0,
-        width: maxWidth
+        width: w
       }
     },
 
